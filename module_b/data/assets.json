@@ -1,0 +1,212 @@
+[
+  {
+    "id": "asset_001",
+    "name": "Sphere",
+    "description": "3D yoga ball sphere shape",
+    "tags": ["sphere", "ball", "round", "3D", "geometric", "basic"],
+    "category": "shape",
+    "style": "minimal",
+    "freepik_id": "4491",
+    "freepik_url": "https://www.freepik.com/3d-model/yoga-ball_4491.htm"
+  },
+  {
+    "id": "asset_002",
+    "name": "Cube",
+    "description": "Basic cubic podium shape",
+    "tags": ["cube", "cubic", "box", "podium", "3D", "geometric", "basic"],
+    "category": "shape",
+    "style": "minimal",
+    "freepik_id": "4637",
+    "freepik_url": "https://www.freepik.com/3d-model/basic-cubic-podium_4637.htm"
+  },
+  {
+    "id": "asset_003",
+    "name": "Torus",
+    "description": "Circular crown podium torus ring shape",
+    "tags": ["torus", "ring", "circular", "donut", "crown", "3D", "geometric"],
+    "category": "shape",
+    "style": "elegant",
+    "freepik_id": "4872",
+    "freepik_url": "https://www.freepik.com/3d-model/circular-crown-podium_4872.htm"
+  },
+  {
+    "id": "asset_004",
+    "name": "Cone",
+    "description": "Abstract cone shape",
+    "tags": ["cone", "triangle", "pointed", "abstract", "3D", "geometric"],
+    "category": "shape",
+    "style": "abstract",
+    "freepik_id": "16814",
+    "freepik_url": "https://www.freepik.com/3d-model/abstract-shape_16814.htm"
+  },
+  {
+    "id": "asset_005",
+    "name": "Gradient Background",
+    "description": "Vivid blurred colorful wallpaper background",
+    "tags": ["gradient", "colorful", "blurred", "vivid", "background", "wallpaper"],
+    "category": "background",
+    "style": "vibrant",
+    "freepik_id": "16482584",
+    "freepik_url": "https://www.freepik.com/free-photo/vivid-blurred-colorful-wallpaper-background_16482584.htm"
+  },
+  {
+    "id": "asset_006",
+    "name": "Pyramid",
+    "description": "3D pyramid geometric shape",
+    "tags": ["pyramid", "triangle", "egyptian", "3D", "geometric", "pointed"],
+    "category": "shape",
+    "style": "classic",
+    "freepik_id": "21592",
+    "freepik_url": "https://www.freepik.com/3d-model/pyramid-shape_21592.htm"
+  },
+  {
+    "id": "asset_007",
+    "name": "Cylinder",
+    "description": "Decorative cylinder shape",
+    "tags": ["cylinder", "tube", "pillar", "3D", "geometric", "decorative"],
+    "category": "shape",
+    "style": "decorative",
+    "freepik_id": "8724",
+    "freepik_url": "https://www.freepik.com/3d-model/decorative-shape_8724.htm"
+  },
+  {
+    "id": "asset_008",
+    "name": "Octahedron",
+    "description": "Decorative octahedron diamond shape",
+    "tags": ["octahedron", "diamond", "crystal", "3D", "geometric", "faceted"],
+    "category": "shape",
+    "style": "geometric",
+    "freepik_id": "15891",
+    "freepik_url": "https://www.freepik.com/3d-model/decorative-shape_15891.htm"
+  },
+  {
+    "id": "asset_009",
+    "name": "Dodecahedron",
+    "description": "12-sided dodecahedron shape",
+    "tags": ["dodecahedron", "polygon", "12-sided", "3D", "geometric", "complex"],
+    "category": "shape",
+    "style": "geometric",
+    "freepik_id": "9056",
+    "freepik_url": "https://www.freepik.com/3d-model/dodecahedron_9056.htm"
+  },
+  {
+    "id": "asset_010",
+    "name": "Capsule",
+    "description": "Capsule pill shape like mini lip tint",
+    "tags": ["capsule", "pill", "rounded", "tube", "3D", "smooth"],
+    "category": "shape",
+    "style": "product",
+    "freepik_id": "2563",
+    "freepik_url": "https://www.freepik.com/3d-model/mini-lip-tint_2563.htm"
+  },
+  {
+    "id": "asset_011",
+    "name": "Twisted Torus",
+    "description": "Twisted glass torus shape",
+    "tags": ["twisted", "torus", "glass", "abstract", "3D", "artistic", "swirl"],
+    "category": "shape",
+    "style": "abstract",
+    "freepik_id": "8871",
+    "freepik_url": "https://www.freepik.com/3d-model/glass-shape_8871.htm"
+  },
+  {
+    "id": "asset_012",
+    "name": "Helix",
+    "description": "Carnival ribbon helix spiral shape",
+    "tags": ["helix", "spiral", "ribbon", "twisted", "3D", "dynamic", "carnival"],
+    "category": "shape",
+    "style": "playful",
+    "freepik_id": "733",
+    "freepik_url": "https://www.freepik.com/3d-model/carnival-ribbon_733.htm"
+  },
+  {
+    "id": "asset_013",
+    "name": "Wave Surface",
+    "description": "Wave sheet podium surface",
+    "tags": ["wave", "surface", "podium", "curved", "3D", "flowing", "organic"],
+    "category": "shape",
+    "style": "organic",
+    "freepik_id": "4394",
+    "freepik_url": "https://www.freepik.com/3d-model/wave-sheet-podium_4394.htm"
+  },
+  {
+    "id": "asset_014",
+    "name": "Liquid Drop",
+    "description": "Makeup sponge liquid drop blob shape",
+    "tags": ["liquid", "drop", "blob", "organic", "3D", "soft", "sponge"],
+    "category": "shape",
+    "style": "organic",
+    "freepik_id": "2449",
+    "freepik_url": "https://www.freepik.com/3d-model/makeup-sponge_2449.htm"
+  },
+  {
+    "id": "asset_015",
+    "name": "Shattered Fragments",
+    "description": "Shattered glass fragments shape",
+    "tags": ["shattered", "fragments", "glass", "broken", "3D", "abstract", "sharp"],
+    "category": "shape",
+    "style": "dramatic",
+    "freepik_id": "10356",
+    "freepik_url": "https://www.freepik.com/3d-model/glass-shape_10356.htm"
+  },
+  {
+    "id": "asset_016",
+    "name": "Pedestal",
+    "description": "Display pedestal platform",
+    "tags": ["pedestal", "platform", "stand", "display", "3D", "podium", "showcase"],
+    "category": "shape",
+    "style": "product",
+    "freepik_id": "22143",
+    "freepik_url": "https://www.freepik.com/3d-model/pedestal_22143.htm"
+  },
+  {
+    "id": "asset_017",
+    "name": "Ring Frame",
+    "description": "Circular ring frame",
+    "tags": ["ring", "frame", "circle", "border", "3D", "outline", "hoop"],
+    "category": "shape",
+    "style": "minimal",
+    "freepik_id": "21879",
+    "freepik_url": "https://www.freepik.com/3d-model/ring_21879.htm"
+  },
+  {
+    "id": "asset_018",
+    "name": "Floating Cubes",
+    "description": "Dice floating cubes",
+    "tags": ["dice", "cubes", "floating", "multiple", "3D", "playful", "scattered"],
+    "category": "shape",
+    "style": "playful",
+    "freepik_id": "1279",
+    "freepik_url": "https://www.freepik.com/3d-model/dice_1279.htm"
+  },
+  {
+    "id": "asset_019",
+    "name": "Glass Panel",
+    "description": "Transparent glass frame panel",
+    "tags": ["glass", "panel", "frame", "transparent", "3D", "window", "clear"],
+    "category": "shape",
+    "style": "modern",
+    "freepik_id": "1694",
+    "freepik_url": "https://www.freepik.com/3d-model/frame_1694.htm"
+  },
+  {
+    "id": "asset_020",
+    "name": "Abstract Ribbon",
+    "description": "Fabric ribbon flowing shape",
+    "tags": ["ribbon", "fabric", "flowing", "silk", "3D", "soft", "elegant"],
+    "category": "shape",
+    "style": "elegant",
+    "freepik_id": "5100",
+    "freepik_url": "https://www.freepik.com/3d-model/fabric-ribbon_5100.htm"
+  },
+  {
+    "id": "asset_021",
+    "name": "Crystal",
+    "description": "Glass crystal prism shape",
+    "tags": ["crystal", "glass", "prism", "gem", "3D", "transparent", "luxury"],
+    "category": "shape",
+    "style": "luxury",
+    "freepik_id": "17181",
+    "freepik_url": "https://www.freepik.com/3d-model/glass-shape_17181.htm"
+  }
+]

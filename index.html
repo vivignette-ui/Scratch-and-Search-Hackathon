@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>9s Drink Ad Demo</title>
+  <title>Brand Ad Scene Player (JSON v0)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,7 +15,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* 整个画面容器：略微竖屏比例，方便当成社交媒体广告 */
+    /* 整个画面容器：竖屏比例，模拟社交媒体广告 */
     .scene {
       position: relative;
       width: 360px;
@@ -38,9 +38,7 @@
       100% { transform: scale(1.06); }
     }
 
-    /* 下面所有元素都是放在 scene-inner 里的“图层” */
-
-    /* 轨道背景（用抽象的白色线条模拟） */
+    /* 轨道背景（抽象白色线条） */
     .track-layer {
       position: absolute;
       inset: 0;
@@ -65,7 +63,7 @@
       animation: bottleYaw 4s ease-in-out infinite alternate;
     }
 
-    /* 瓶身上的“气泡感” */
+    /* 瓶身气泡高光 */
     .bottle::after {
       content: "";
       position: absolute;
@@ -84,7 +82,7 @@
       100% { transform: translate(-50%, -50%) rotateY(3deg); }
     }
 
-    /* 瓶口平台（游乐园观景台感） */
+    /* 瓶口平台 */
     .bottle-platform {
       position: absolute;
       left: 50%;
@@ -129,7 +127,7 @@
       100% { transform: translate(-50%, 0); }
     }
 
-    /* 轨道上的小罐头（整圈运动用左右往返来模拟即可） */
+    /* 轨道上的小罐头（往返运动模拟整圈） */
     .can-on-track {
       position: absolute;
       width: 34px;
@@ -180,7 +178,7 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* 圆形小路牌，原地慢慢旋转 */
+    /* 圆形小路牌，原地旋转 */
     .sign {
       position: absolute;
       width: 36px;
@@ -192,15 +190,15 @@
       transform-origin: center;
       animation: signSpin 10s linear infinite;
     }
-    .sign.sign-1 { right: 18%; top: 62%; }
-    .sign.sign-2 { right: 8%; top: 72%; }
+    .sign-1 { right: 18%; top: 62%; }
+    .sign-2 { right: 8%; top: 72%; }
 
     @keyframes signSpin {
       0%   { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    /* 左侧独立罐头：一边自转，一边缓慢上升 */
+    /* 左侧独立罐头：上升 + 自转 */
     .solo-can {
       position: absolute;
       left: 10%;
@@ -226,7 +224,7 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* 静态树木 + 轻微晃动人物（用小点模拟） */
+    /* 树 */
     .tree {
       position: absolute;
       width: 26px;
@@ -235,10 +233,11 @@
       background: radial-gradient(circle at 30% 20%, #e9ffef 0, #58c978 40%, #21753c 100%);
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
-    .tree.t1 { left: 22%; top: 70%; }
-    .tree.t2 { left: 32%; top: 60%; }
-    .tree.t3 { left: 64%; top: 74%; }
+    .t1 { left: 22%; top: 70%; }
+    .t2 { left: 32%; top: 60%; }
+    .t3 { left: 64%; top: 74%; }
 
+    /* 小人：轻微摇摆 */
     .person {
       position: absolute;
       width: 6px;
@@ -247,54 +246,151 @@
       background: #333;
       animation: personSway 2.4s ease-in-out infinite;
     }
-    .person.p1 { left: 26%; top: 77%; }
-    .person.p2 { left: 36%; top: 65%; }
-    .person.p3 { left: 60%; top: 78%; }
+    .p1 { left: 26%; top: 77%; }
+    .p2 { left: 36%; top: 65%; }
+    .p3 { left: 60%; top: 78%; }
 
     @keyframes personSway {
       0%   { transform: translateX(0); }
       50%  { transform: translateX(2px); }
       100% { transform: translateX(0); }
     }
-
   </style>
 </head>
 <body>
+  <!-- 场景容器 -->
   <div class="scene">
-    <div class="scene-inner">
-      <!-- 背景轨道层 -->
-      <div class="track-layer"></div>
-
-      <!-- 中央瓶子 + 平台 + 菠萝 -->
-      <div class="bottle">
-        <div class="bottle-platform">
-          <div class="pineapple"></div>
-        </div>
-      </div>
-
-      <!-- 轨道上的循环罐头 -->
-      <div class="can-on-track"></div>
-
-      <!-- 摩天轮 -->
-      <div class="ferris-wheel"></div>
-
-      <!-- 路牌 -->
-      <div class="sign sign-1"></div>
-      <div class="sign sign-2"></div>
-
-      <!-- 左侧独立罐头 -->
-      <div class="solo-can"></div>
-
-      <!-- 树 + 人物 -->
-      <div class="tree t1"></div>
-      <div class="tree t2"></div>
-      <div class="tree t3"></div>
-
-      <div class="person p1"></div>
-      <div class="person p2"></div>
-      <div class="person p3"></div>
-
-    </div>
+    <!-- 这里先是空的，下面的脚本会根据 JSON 填充内容 -->
+    <div class="scene-inner" id="scene-inner"></div>
   </div>
+
+  <script>
+    // 这是我们当前版本的 "adJson"：描述这个镜头里有哪些元素
+    const adJson = {
+      shots: [
+        {
+          id: 1,
+          durationMs: 9000,
+          elements: [
+            { id: "track", type: "track-layer" },
+
+            { id: "bottleMain", type: "bottle" },
+            { id: "pineappleTop", type: "pineapple" }, // 会自动挂在瓶口平台上
+
+            { id: "canLoop", type: "can-on-track" },
+
+            { id: "wheelRight", type: "ferris-wheel" },
+
+            { id: "sign1", type: "sign", variant: "sign-1" },
+            { id: "sign2", type: "sign", variant: "sign-2" },
+
+            { id: "soloCan", type: "solo-can" },
+
+            { id: "tree1", type: "tree", variant: "t1" },
+            { id: "tree2", type: "tree", variant: "t2" },
+            { id: "tree3", type: "tree", variant: "t3" },
+
+            { id: "person1", type: "person", variant: "p1" },
+            { id: "person2", type: "person", variant: "p2" },
+            { id: "person3", type: "person", variant: "p3" }
+          ]
+        }
+      ]
+    };
+
+    // 根据 adJson 渲染第一个镜头
+    function renderShot(shot) {
+      const inner = document.getElementById("scene-inner");
+      inner.innerHTML = "";
+
+      // 一个小字典，用于把“瓶子”等特殊元素引用起来
+      const refs = {};
+
+      // 先放轨道背景（如果 JSON 里有）
+      shot.elements
+        .filter(e => e.type === "track-layer")
+        .forEach(() => {
+          const track = document.createElement("div");
+          track.className = "track-layer";
+          inner.appendChild(track);
+        });
+
+      // 再放其它元素
+      shot.elements
+        .filter(e => e.type !== "track-layer")
+        .forEach(el => {
+          switch (el.type) {
+            case "bottle": {
+              const bottle = document.createElement("div");
+              bottle.className = "bottle";
+
+              const platform = document.createElement("div");
+              platform.className = "bottle-platform";
+              bottle.appendChild(platform);
+
+              inner.appendChild(bottle);
+              refs.bottle = { bottle, platform };
+              break;
+            }
+            case "pineapple": {
+              const p = document.createElement("div");
+              p.className = "pineapple";
+
+              if (refs.bottle && refs.bottle.platform) {
+                refs.bottle.platform.appendChild(p);
+              } else {
+                inner.appendChild(p);
+              }
+              break;
+            }
+            case "can-on-track": {
+              const can = document.createElement("div");
+              can.className = "can-on-track";
+              inner.appendChild(can);
+              break;
+            }
+            case "ferris-wheel": {
+              const wheel = document.createElement("div");
+              wheel.className = "ferris-wheel";
+              inner.appendChild(wheel);
+              break;
+            }
+            case "solo-can": {
+              const s = document.createElement("div");
+              s.className = "solo-can";
+              inner.appendChild(s);
+              break;
+            }
+            case "sign": {
+              const sign = document.createElement("div");
+              sign.className = "sign";
+              if (el.variant) sign.classList.add(el.variant);
+              inner.appendChild(sign);
+              break;
+            }
+            case "tree": {
+              const tree = document.createElement("div");
+              tree.className = "tree";
+              if (el.variant) tree.classList.add(el.variant);
+              inner.appendChild(tree);
+              break;
+            }
+            case "person": {
+              const person = document.createElement("div");
+              person.className = "person";
+              if (el.variant) person.classList.add(el.variant);
+              inner.appendChild(person);
+              break;
+            }
+            default:
+              // 未知类型暂时忽略
+              break;
+          }
+        });
+    }
+
+    // 现在只渲染第一个镜头
+    renderShot(adJson.shots[0]);
+  </script>
 </body>
 </html>

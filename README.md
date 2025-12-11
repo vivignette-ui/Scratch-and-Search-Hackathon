@@ -1,78 +1,3 @@
-{
-  "shots": [
-    {
-      "id": 1,
-      "duration": 9000,
-      "camera": {
-        "movement": "slow-zoom-in",
-        "angle": "slightly-top-down"
-      },
-      "elements": [
-        {
-          "id": "product",
-          "type": "bottle",
-          "motion": "yaw",
-          "position": { "x": 50, "y": 52 },
-          "presetPosition": "pos-bottle-center",
-          "asset": null
-        },
-        {
-          "id": "platform",
-          "type": "bottle-platform",
-          "parent": "product"
-        },
-        {
-          "id": "fruitTop",
-          "type": "pineapple",
-          "parent": "platform",
-          "motion": "float"
-        },
-        {
-          "id": "canLoop",
-          "type": "can-on-track",
-          "motion": "loop-track"
-        },
-        {
-          "id": "wheelRight",
-          "type": "ferris-wheel",
-          "motion": "rotate-wheel",
-          "presetPosition": "pos-wheel-right"
-        },
-        {
-          "id": "sign1",
-          "type": "sign",
-          "motion": "spin-slow",
-          "presetPosition": "pos-sign-1"
-        },
-        {
-          "id": "sign2",
-          "type": "sign",
-          "motion": "spin-slow",
-          "presetPosition": "pos-sign-2"
-        },
-        {
-          "id": "soloCan",
-          "type": "solo-can",
-          "motion": "rise-spin",
-          "presetPosition": "pos-solo-can-left"
-        },
-        {
-          "id": "tree1",
-          "type": "tree",
-          "presetPosition": "pos-tree-1"
-        },
-        {
-          "id": "person1",
-          "type": "person",
-          "motion": "sway",
-          "presetPosition": "pos-person-1"
-        }
-      ]
-    }
-  ]
-}
-
-
 # Team Pipeline
 
 ## 🎯 项目目标
@@ -122,4 +47,115 @@
 - 定义统一的元素类型列表（bottle / pipe / fruit / wheel / can / tree ...）  
 - 定义通用动效名称（rotate / float / drift / spin / loop ...）  
 - 输出一个简单的 `/preview` 接口用于调试 A/B 的 JSON
+
+
+## adJson v1 场景描述规范（单镜头版）
+
+播放器吃的结构叫 `adJson`，当前是单镜头版本：
+
+```jsonc
+{
+  "shots": [
+    {
+      "id": 1,
+      "duration": 9000,          // 毫秒，当前就是 9 秒
+      "camera": {
+        "movement": "slow-zoom-in",       // 相机缓慢推进
+        "angle": "slightly-top-down"      // 稍微俯视
+      },
+      "elements": [
+        {
+          "id": "product",
+          "type": "bottle",               // 元素类型：瓶子
+          "motion": "yaw",                // 动效：轻微左右转
+          "position": { "x": 50, "y": 52 }, // 屏幕百分比位置（0–100）
+          "presetPosition": "pos-bottle-center",
+          "asset": null                   // 以后可以填图片地址
+        },
+        {
+          "id": "platform",
+          "type": "bottle-platform",
+          "parent": "product"             // 挂在 product 下面
+        },
+        {
+          "id": "fruitTop",
+          "type": "pineapple",
+          "parent": "platform",           // 挂在平台上
+          "motion": "float"
+        },
+
+        {
+          "id": "canLoop",
+          "type": "can-on-track",
+          "motion": "loop-track"
+        },
+
+        {
+          "id": "wheelRight",
+          "type": "ferris-wheel",
+          "motion": "rotate-wheel",
+          "presetPosition": "pos-wheel-right"
+        },
+
+        {
+          "id": "sign1",
+          "type": "sign",
+          "motion": "spin-slow",
+          "presetPosition": "pos-sign-1"
+        },
+        {
+          "id": "sign2",
+          "type": "sign",
+          "motion": "spin-slow",
+          "presetPosition": "pos-sign-2"
+        },
+
+        {
+          "id": "soloCan",
+          "type": "solo-can",
+          "motion": "rise-spin",
+          "presetPosition": "pos-solo-can-left"
+        },
+
+        {
+          "id": "tree1",
+          "type": "tree",
+          "motion": null,
+          "presetPosition": "pos-tree-1"
+        },
+        {
+          "id": "tree2",
+          "type": "tree",
+          "motion": null,
+          "presetPosition": "pos-tree-2"
+        },
+        {
+          "id": "tree3",
+          "type": "tree",
+          "motion": null,
+          "presetPosition": "pos-tree-3"
+        },
+
+        {
+          "id": "person1",
+          "type": "person",
+          "motion": "sway",
+          "presetPosition": "pos-person-1"
+        },
+        {
+          "id": "person2",
+          "type": "person",
+          "motion": "sway",
+          "presetPosition": "pos-person-2"
+        },
+        {
+          "id": "person3",
+          "type": "person",
+          "motion": "sway",
+          "presetPosition": "pos-person-3"
+        }
+      ]
+    }
+  ]
+}
 

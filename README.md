@@ -1,4 +1,79 @@
-# Scratch-and-Search Hackathon – Team Pipeline
+{
+  "shots": [
+    {
+      "id": 1,
+      "duration": 9000,
+      "camera": {
+        "movement": "slow-zoom-in",
+        "angle": "slightly-top-down"
+      },
+      "elements": [
+        {
+          "id": "product",
+          "type": "bottle",
+          "motion": "yaw",
+          "position": { "x": 50, "y": 52 },
+          "presetPosition": "pos-bottle-center",
+          "asset": null
+        },
+        {
+          "id": "platform",
+          "type": "bottle-platform",
+          "parent": "product"
+        },
+        {
+          "id": "fruitTop",
+          "type": "pineapple",
+          "parent": "platform",
+          "motion": "float"
+        },
+        {
+          "id": "canLoop",
+          "type": "can-on-track",
+          "motion": "loop-track"
+        },
+        {
+          "id": "wheelRight",
+          "type": "ferris-wheel",
+          "motion": "rotate-wheel",
+          "presetPosition": "pos-wheel-right"
+        },
+        {
+          "id": "sign1",
+          "type": "sign",
+          "motion": "spin-slow",
+          "presetPosition": "pos-sign-1"
+        },
+        {
+          "id": "sign2",
+          "type": "sign",
+          "motion": "spin-slow",
+          "presetPosition": "pos-sign-2"
+        },
+        {
+          "id": "soloCan",
+          "type": "solo-can",
+          "motion": "rise-spin",
+          "presetPosition": "pos-solo-can-left"
+        },
+        {
+          "id": "tree1",
+          "type": "tree",
+          "presetPosition": "pos-tree-1"
+        },
+        {
+          "id": "person1",
+          "type": "person",
+          "motion": "sway",
+          "presetPosition": "pos-person-1"
+        }
+      ]
+    }
+  ]
+}
+
+
+# Team Pipeline
 
 ## 🎯 项目目标
 

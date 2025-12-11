@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>Brand Ad Scene Player (JSON v0)</title>
+  <title>Brand Ad Scene Player (adJson v1)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,7 +15,6 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* 整个画面容器：竖屏比例，模拟社交媒体广告 */
     .scene {
       position: relative;
       width: 360px;
@@ -25,7 +24,6 @@
       background: radial-gradient(circle at top, #ffe0f0 0%, #ffc0d8 40%, #f58ab0 80%);
     }
 
-    /* 镜头轻微推进（9 秒从 1.0 放大到 1.06） */
     .scene-inner {
       position: absolute;
       inset: 0;
@@ -38,7 +36,15 @@
       100% { transform: scale(1.06); }
     }
 
-    /* 轨道背景（抽象白色线条） */
+    /* 通用基类 */
+    .el {
+      position: absolute;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* 轨道背景层 */
     .track-layer {
       position: absolute;
       inset: 0;
@@ -49,21 +55,17 @@
       filter: blur(2px);
     }
 
-    /* 中央瓶子 */
+    /* 各类型的默认外观（后面可以被 asset 覆盖） */
+
     .bottle {
-      position: absolute;
-      left: 50%;
-      top: 52%;
       width: 120px;
       height: 320px;
-      transform: translate(-50%, -50%);
       border-radius: 40px;
       background: linear-gradient(to bottom, #ffbf6d 0%, #b54b16 40%, #5a1c06 100%);
       box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-      animation: bottleYaw 4s ease-in-out infinite alternate;
+      transform: translate(-50%, -50%);
     }
 
-    /* 瓶身气泡高光 */
     .bottle::after {
       content: "";
       position: absolute;
@@ -77,12 +79,6 @@
       opacity: 0.9;
     }
 
-    @keyframes bottleYaw {
-      0%   { transform: translate(-50%, -50%) rotateY(-3deg); }
-      100% { transform: translate(-50%, -50%) rotateY(3deg); }
-    }
-
-    /* 瓶口平台 */
     .bottle-platform {
       position: absolute;
       left: 50%;
@@ -95,18 +91,12 @@
       box-shadow: 0 8px 18px rgba(0,0,0,0.25);
     }
 
-    /* 瓶口上的小菠萝 */
     .pineapple {
-      position: absolute;
-      left: 50%;
-      top: -28px;
       width: 32px;
       height: 32px;
-      transform: translateX(-50%);
       border-radius: 10px;
       background: radial-gradient(circle at 30% 20%, #ffe699 0, #ffbf3f 40%, #f28a00 100%);
       box-shadow: 0 6px 10px rgba(0,0,0,0.25);
-      animation: pineappleFloat 2.8s ease-in-out infinite;
     }
 
     .pineapple::before {
@@ -121,42 +111,29 @@
       background: radial-gradient(circle at 50% 0%, #2ecc71 0, #1c9c4c 60%, #0b5c2b 100%);
     }
 
-    @keyframes pineappleFloat {
-      0%   { transform: translate(-50%, 0); }
-      50%  { transform: translate(-50%, -6px); }
-      100% { transform: translate(-50%, 0); }
-    }
-
-    /* 轨道上的小罐头（往返运动模拟整圈） */
-    .can-on-track {
-      position: absolute;
+    .can-on-track,
+    .solo-can {
       width: 34px;
       height: 52px;
       border-radius: 12px;
       background: linear-gradient(to bottom, #ffffff 0%, #ffebfb 50%, #ffd6f4 100%);
       box-shadow: 0 6px 10px rgba(0,0,0,0.25);
-      top: 68%;
-      left: -10%;
-      animation: canTrackMove 9s linear infinite;
     }
 
-    @keyframes canTrackMove {
-      0%   { left: -10%; }
-      50%  { left: 80%; }
-      100% { left: -10%; }
+    .solo-can {
+      width: 36px;
+      height: 60px;
+      border-radius: 14px;
+      background: linear-gradient(to bottom, #ffffff 0%, #ffe3f5 40%, #ffc6ea 100%);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.35);
     }
 
-    /* 右侧摩天轮 */
     .ferris-wheel {
-      position: absolute;
       width: 120px;
       height: 120px;
       border-radius: 50%;
       border: 6px solid #ff9ac5;
-      right: -10px;
-      top: 40%;
       box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-      animation: wheelRotate 20s linear infinite;
     }
 
     .ferris-wheel::before,
@@ -170,226 +147,343 @@
       background: #ff9ac5;
       transform-origin: center;
     }
+
     .ferris-wheel::before { transform: translate(-50%, -50%) rotate(45deg); }
     .ferris-wheel::after { transform: translate(-50%, -50%) rotate(-45deg); }
 
-    @keyframes wheelRotate {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* 圆形小路牌，原地旋转 */
     .sign {
-      position: absolute;
       width: 36px;
       height: 36px;
       border-radius: 50%;
       border: 3px solid #ffb6cf;
       background: #ffeef5;
       box-shadow: 0 4px 8px rgba(0,0,0,0.18);
-      transform-origin: center;
-      animation: signSpin 10s linear infinite;
-    }
-    .sign-1 { right: 18%; top: 62%; }
-    .sign-2 { right: 8%; top: 72%; }
-
-    @keyframes signSpin {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
     }
 
-    /* 左侧独立罐头：上升 + 自转 */
-    .solo-can {
-      position: absolute;
-      left: 10%;
-      bottom: 12%;
-      width: 36px;
-      height: 60px;
-      border-radius: 14px;
-      background: linear-gradient(to bottom, #ffffff 0%, #ffe3f5 40%, #ffc6ea 100%);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.35);
-      animation:
-        soloCanRise 9s ease-in-out infinite,
-        soloCanSpin 4s linear infinite;
-    }
-
-    @keyframes soloCanRise {
-      0%   { transform: translateY(0); }
-      50%  { transform: translateY(-80px); }
-      100% { transform: translateY(0); }
-    }
-
-    @keyframes soloCanSpin {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* 树 */
     .tree {
-      position: absolute;
       width: 26px;
       height: 26px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 20%, #e9ffef 0, #58c978 40%, #21753c 100%);
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
-    .t1 { left: 22%; top: 70%; }
-    .t2 { left: 32%; top: 60%; }
-    .t3 { left: 64%; top: 74%; }
 
-    /* 小人：轻微摇摆 */
     .person {
-      position: absolute;
       width: 6px;
       height: 12px;
       border-radius: 3px;
       background: #333;
-      animation: personSway 2.4s ease-in-out infinite;
     }
-    .p1 { left: 26%; top: 77%; }
-    .p2 { left: 36%; top: 65%; }
-    .p3 { left: 60%; top: 78%; }
+
+    /* 位置预设（如果 JSON 没给 position 就用这些） */
+    .pos-bottle-center { left: 50%; top: 52%; transform: translate(-50%, -50%); }
+    .pos-wheel-right { right: -10px; top: 40%; }
+    .pos-sign-1 { right: 18%; top: 62%; }
+    .pos-sign-2 { right: 8%; top: 72%; }
+    .pos-solo-can-left { left: 10%; bottom: 12%; }
+    .pos-tree-1 { left: 22%; top: 70%; }
+    .pos-tree-2 { left: 32%; top: 60%; }
+    .pos-tree-3 { left: 64%; top: 74%; }
+    .pos-person-1 { left: 26%; top: 77%; }
+    .pos-person-2 { left: 36%; top: 65%; }
+    .pos-person-3 { left: 60%; top: 78%; }
+
+    /* 动效预设（由 JSON 的 motion 决定） */
+    @keyframes bottleYaw {
+      0%   { transform: translate(-50%, -50%) rotateY(-3deg); }
+      100% { transform: translate(-50%, -50%) rotateY(3deg); }
+    }
+    .motion-yaw { animation: bottleYaw 4s ease-in-out infinite alternate; }
+
+    @keyframes pineappleFloat {
+      0%   { transform: translate(-50%, 0); }
+      50%  { transform: translate(-50%, -6px); }
+      100% { transform: translate(-50%, 0); }
+    }
+    .motion-float {
+      animation: pineappleFloat 2.8s ease-in-out infinite;
+    }
+
+    @keyframes canTrackMove {
+      0%   { left: -10%; }
+      50%  { left: 80%; }
+      100% { left: -10%; }
+    }
+    .motion-loop-track { animation: canTrackMove 9s linear infinite; }
+
+    @keyframes wheelRotate {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .motion-rotate-wheel { animation: wheelRotate 20s linear infinite; }
+
+    @keyframes signSpin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .motion-spin-slow { animation: signSpin 10s linear infinite; }
+
+    @keyframes soloCanRise {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-80px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes soloCanSpin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .motion-rise-spin {
+      animation:
+        soloCanRise 9s ease-in-out infinite,
+        soloCanSpin 4s linear infinite;
+    }
 
     @keyframes personSway {
       0%   { transform: translateX(0); }
       50%  { transform: translateX(2px); }
       100% { transform: translateX(0); }
     }
+    .motion-sway { animation: personSway 2.4s ease-in-out infinite; }
+
   </style>
 </head>
 <body>
-  <!-- 场景容器 -->
   <div class="scene">
-    <!-- 这里先是空的，下面的脚本会根据 JSON 填充内容 -->
     <div class="scene-inner" id="scene-inner"></div>
   </div>
 
   <script>
-    // 这是我们当前版本的 "adJson"：描述这个镜头里有哪些元素
+    // adJson v1：单镜头版本，后续 A/B 只要按这个结构输出即可
     const adJson = {
       shots: [
         {
           id: 1,
-          durationMs: 9000,
+          duration: 9000,
+          camera: {
+            movement: "slow-zoom-in",
+            angle: "slightly-top-down"
+          },
           elements: [
-            { id: "track", type: "track-layer" },
-
-            { id: "bottleMain", type: "bottle" },
-            { id: "pineappleTop", type: "pineapple" }, // 会自动挂在瓶口平台上
-
-            { id: "canLoop", type: "can-on-track" },
-
-            { id: "wheelRight", type: "ferris-wheel" },
-
-            { id: "sign1", type: "sign", variant: "sign-1" },
-            { id: "sign2", type: "sign", variant: "sign-2" },
-
-            { id: "soloCan", type: "solo-can" },
-
-            { id: "tree1", type: "tree", variant: "t1" },
-            { id: "tree2", type: "tree", variant: "t2" },
-            { id: "tree3", type: "tree", variant: "t3" },
-
-            { id: "person1", type: "person", variant: "p1" },
-            { id: "person2", type: "person", variant: "p2" },
-            { id: "person3", type: "person", variant: "p3" }
+            {
+              id: "track",
+              type: "track-layer"
+            },
+            {
+              id: "product",
+              type: "bottle",
+              motion: "yaw",
+              position: { x: 50, y: 52 },   // 百分比位置
+              presetPosition: "pos-bottle-center"
+            },
+            {
+              id: "platform",
+              type: "bottle-platform",
+              parent: "product"
+            },
+            {
+              id: "fruitTop",
+              type: "pineapple",
+              parent: "platform",
+              motion: "float"
+            },
+            {
+              id: "canLoop",
+              type: "can-on-track",
+              motion: "loop-track"
+            },
+            {
+              id: "wheelRight",
+              type: "ferris-wheel",
+              motion: "rotate-wheel",
+              presetPosition: "pos-wheel-right"
+            },
+            {
+              id: "sign1",
+              type: "sign",
+              motion: "spin-slow",
+              presetPosition: "pos-sign-1"
+            },
+            {
+              id: "sign2",
+              type: "sign",
+              motion: "spin-slow",
+              presetPosition: "pos-sign-2"
+            },
+            {
+              id: "soloCan",
+              type: "solo-can",
+              motion: "rise-spin",
+              presetPosition: "pos-solo-can-left"
+            },
+            {
+              id: "tree1",
+              type: "tree",
+              motion: null,
+              presetPosition: "pos-tree-1"
+            },
+            {
+              id: "tree2",
+              type: "tree",
+              motion: null,
+              presetPosition: "pos-tree-2"
+            },
+            {
+              id: "tree3",
+              type: "tree",
+              motion: null,
+              presetPosition: "pos-tree-3"
+            },
+            {
+              id: "person1",
+              type: "person",
+              motion: "sway",
+              presetPosition: "pos-person-1"
+            },
+            {
+              id: "person2",
+              type: "person",
+              motion: "sway",
+              presetPosition: "pos-person-2"
+            },
+            {
+              id: "person3",
+              type: "person",
+              motion: "sway",
+              presetPosition: "pos-person-3"
+            }
           ]
         }
       ]
     };
 
-    // 根据 adJson 渲染第一个镜头
+    // 将 motion 字段转换成具体的 CSS 类名
+    function motionToClass(motion) {
+      if (!motion) return null;
+      switch (motion) {
+        case "yaw": return "motion-yaw";
+        case "float": return "motion-float";
+        case "loop-track": return "motion-loop-track";
+        case "rotate-wheel": return "motion-rotate-wheel";
+        case "spin-slow": return "motion-spin-slow";
+        case "rise-spin": return "motion-rise-spin";
+        case "sway": return "motion-sway";
+        default: return null;
+      }
+    }
+
     function renderShot(shot) {
       const inner = document.getElementById("scene-inner");
       inner.innerHTML = "";
 
-      // 一个小字典，用于把“瓶子”等特殊元素引用起来
+      // 轨道背景单独处理
+      const hasTrack = shot.elements.some(e => e.type === "track-layer");
+      if (hasTrack) {
+        const track = document.createElement("div");
+        track.className = "track-layer";
+        inner.appendChild(track);
+      }
+
       const refs = {};
 
-      // 先放轨道背景（如果 JSON 里有）
-      shot.elements
-        .filter(e => e.type === "track-layer")
-        .forEach(() => {
-          const track = document.createElement("div");
-          track.className = "track-layer";
-          inner.appendChild(track);
-        });
-
-      // 再放其它元素
       shot.elements
         .filter(e => e.type !== "track-layer")
         .forEach(el => {
+          let node;
+
+          // 按 type 创建不同的元素
           switch (el.type) {
             case "bottle": {
-              const bottle = document.createElement("div");
-              bottle.className = "bottle";
-
-              const platform = document.createElement("div");
-              platform.className = "bottle-platform";
-              bottle.appendChild(platform);
-
-              inner.appendChild(bottle);
-              refs.bottle = { bottle, platform };
+              node = document.createElement("div");
+              node.className = "el bottle";
+              break;
+            }
+            case "bottle-platform": {
+              node = document.createElement("div");
+              node.className = "bottle-platform";
               break;
             }
             case "pineapple": {
-              const p = document.createElement("div");
-              p.className = "pineapple";
-
-              if (refs.bottle && refs.bottle.platform) {
-                refs.bottle.platform.appendChild(p);
-              } else {
-                inner.appendChild(p);
-              }
+              node = document.createElement("div");
+              node.className = "el pineapple";
               break;
             }
             case "can-on-track": {
-              const can = document.createElement("div");
-              can.className = "can-on-track";
-              inner.appendChild(can);
-              break;
-            }
-            case "ferris-wheel": {
-              const wheel = document.createElement("div");
-              wheel.className = "ferris-wheel";
-              inner.appendChild(wheel);
+              node = document.createElement("div");
+              node.className = "el can-on-track";
               break;
             }
             case "solo-can": {
-              const s = document.createElement("div");
-              s.className = "solo-can";
-              inner.appendChild(s);
+              node = document.createElement("div");
+              node.className = "el solo-can";
+              break;
+            }
+            case "ferris-wheel": {
+              node = document.createElement("div");
+              node.className = "el ferris-wheel";
               break;
             }
             case "sign": {
-              const sign = document.createElement("div");
-              sign.className = "sign";
-              if (el.variant) sign.classList.add(el.variant);
-              inner.appendChild(sign);
+              node = document.createElement("div");
+              node.className = "el sign";
               break;
             }
             case "tree": {
-              const tree = document.createElement("div");
-              tree.className = "tree";
-              if (el.variant) tree.classList.add(el.variant);
-              inner.appendChild(tree);
+              node = document.createElement("div");
+              node.className = "el tree";
               break;
             }
             case "person": {
-              const person = document.createElement("div");
-              person.className = "person";
-              if (el.variant) person.classList.add(el.variant);
-              inner.appendChild(person);
+              node = document.createElement("div");
+              node.className = "el person";
               break;
             }
             default:
-              // 未知类型暂时忽略
-              break;
+              return; // 未知类型暂时忽略
+          }
+
+          // 如果 JSON 给了 position，就用百分比定位
+          if (el.position && typeof el.position.x === "number" && typeof el.position.y === "number") {
+            node.style.left = el.position.x + "%";
+            node.style.top = el.position.y + "%";
+            // 特殊情况：中间瓶子要居中
+            if (el.type === "bottle") {
+              node.style.transform = "translate(-50%, -50%)";
+            }
+          }
+
+          // 如果给了预设位置 class，就加上
+          if (el.presetPosition) {
+            node.classList.add(el.presetPosition);
+          }
+
+          // 如果给了 asset，就当作背景图
+          if (el.asset) {
+            node.style.backgroundImage = `url('${el.asset}')`;
+          }
+
+          // 如果有动效字段，就加对应 CSS 类
+          const motionClass = motionToClass(el.motion);
+          if (motionClass) {
+            node.classList.add(motionClass);
+          }
+
+          // 先挂到 scene 或父元素上
+          if (el.parent && refs[el.parent]) {
+            refs[el.parent].appendChild(node);
+          } else if (el.parent && el.parent === "product" && refs["platform"]) {
+            // pineapple 的 parent 绑在平台上
+            refs["platform"].appendChild(node);
+          } else {
+            inner.appendChild(node);
+          }
+
+          // 保留引用，方便后续元素作为 parent
+          if (el.id) {
+            refs[el.id] = node;
           }
         });
     }
 
-    // 现在只渲染第一个镜头
     renderShot(adJson.shots[0]);
   </script>
 </body>

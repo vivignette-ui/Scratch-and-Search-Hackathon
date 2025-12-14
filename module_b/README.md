@@ -1,6 +1,30 @@
-# Module B: Asset Retrieval
+# Module B: Asset Retriever
 
-向量检索模块 - 根据镜头描述搜索匹配的 3D 资产
+3D 素材向量检索模块 - 根据镜头描述搜索匹配的 3D 资产
+
+## 功能
+
+- 基于语义搜索匹配 3D 素材
+- 返回预览图（本地路径 + 在线 URL）
+- 支持单个/批量镜头搜索
+
+## 目录结构
+
+```
+module_b/
+├── __init__.py
+├── retriever.py          # 核心检索类
+├── setup_db.py           # 导入数据到 Qdrant
+├── generate_embeddings.py
+├── data/
+│   ├── assets.json       # 素材元数据
+│   ├── assets_embeddings.json
+│   └── assets/
+│       └── previews/     # 预览图
+│           ├── asset_001_sphere.png
+│           └── ...
+└── README.md
+```
 
 ## 快速开始
 
@@ -16,159 +40,146 @@ pip install qdrant-client sentence-transformers
 docker run -p 6333:6333 qdrant/qdrant
 ```
 
-### 3. 初始化数据库（只需运行一次）
+### 3. 导入数据
 
 ```bash
-cd module_b
 python setup_db.py
 ```
 
----
-
-## 如何调用
-
-### 基本用法
+### 4. 使用
 
 ```python
 from module_b import AssetRetriever
 
 retriever = AssetRetriever()
+results = retriever.search("metallic sphere", top_k=3)
 
-# 搜索资产
-results = retriever.search("metallic sphere on dark background")
+for asset in results:
+    print(asset['name'])
+    print(asset['local_preview'])  # 本地图片路径
+    print(asset['preview_url'])    # 在线图片 URL
 ```
 
-### 返回格式
+## API
+
+### `AssetRetriever`
+
+```python
+retriever = AssetRetriever(
+    host="localhost",      # Qdrant 地址
+    port=6333,             # Qdrant 端口
+    collection_name="assets"
+)
+```
+
+### `search(query, top_k=5)`
+
+搜索匹配的素材
+
+```python
+results = retriever.search("colorful gradient background", top_k=3)
+```
+
+**返回示例：**
 
 ```python
 [
     {
         "id": "asset_001",
-        "name": "Metallic Sphere",
-        "description": "A shiny metallic silver sphere with reflections",
+        "name": "Sphere",
+        "description": "3D yoga ball sphere shape",
         "category": "shape",
-        "style": "modern",
-        "freepik_url": "https://...",
-        "score": 0.8234  # 相似度分数
-    },
-    ...
+        "style": "minimal",
+        "freepik_id": "4491",
+        "freepik_url": "https://www.freepik.com/3d-model/yoga-ball_4491.htm",
+        "preview_url": "https://img.freepik.com/3d-models/v2/.../yoga-ball-poster-1.png",
+        "local_preview": "/path/to/module_b/data/assets/previews/asset_001_sphere.png",
+        "score": 0.7823
+    }
 ]
-```
-
----
-
-## API 参考
-
-### `AssetRetriever`
-
-```python
-retriever = AssetRetriever(host="localhost", port=6333)
-```
-
-| 参数 | 默认值 | 说明 |
-|------|--------|------|
-| `host` | `"localhost"` | Qdrant 地址 |
-| `port` | `6333` | Qdrant 端口 |
-
-### `search(query, top_k=5)`
-
-搜索单个查询
-
-```python
-results = retriever.search("golden metallic texture", top_k=3)
 ```
 
 ### `search_shot(shot_description, top_k=3)`
 
-为单个镜头搜索资产，返回带描述的结构
+为单个镜头搜索素材（供 Module A 调用）
 
 ```python
-result = retriever.search_shot("A rotating glass cube with light refraction")
-# 返回:
-# {
-#     "shot_description": "A rotating glass cube...",
-#     "matched_assets": [...]
-# }
+result = retriever.search_shot("product reveal with shiny sphere")
 ```
 
 ### `search_multiple_shots(shots, top_k=3)`
 
-批量搜索多个镜头（配合 Module A）
+批量搜索多个镜头
 
 ```python
 shots = [
-    "golden sphere floating in space",
-    "blue gradient background",
-    "glass crystal with rainbow refraction"
+    "product reveal with metallic sphere",
+    "luxury showcase on dark background",
+    "final shot with gradient"
 ]
 results = retriever.search_multiple_shots(shots)
 ```
 
----
+## 素材列表
 
-## 与 Module A 对接示例
+共 21 个 3D 素材：
+
+| ID | 名称 | 类别 | 风格 |
+|----|------|------|------|
+| asset_001 | Sphere | shape | minimal |
+| asset_002 | Cube | shape | minimal |
+| asset_003 | Torus | shape | elegant |
+| asset_004 | Cone | shape | abstract |
+| asset_005 | Gradient Background | background | vibrant |
+| asset_006 | Pyramid | shape | classic |
+| asset_007 | Cylinder | shape | decorative |
+| asset_008 | Octahedron | shape | geometric |
+| asset_009 | Dodecahedron | shape | geometric |
+| asset_010 | Capsule | shape | product |
+| asset_011 | Twisted Torus | shape | abstract |
+| asset_012 | Helix | shape | playful |
+| asset_013 | Wave Surface | shape | organic |
+| asset_014 | Liquid Drop | shape | organic |
+| asset_015 | Shattered Fragments | shape | dramatic |
+| asset_016 | Pedestal | shape | product |
+| asset_017 | Ring Frame | shape | minimal |
+| asset_018 | Floating Cubes | shape | playful |
+| asset_019 | Glass Panel | shape | modern |
+| asset_020 | Abstract Ribbon | shape | elegant |
+| asset_021 | Crystal | shape | luxury |
+
+## 与其他模块集成
+
+### Module A → Module B
 
 ```python
-from module_a import ShotPlanner
+# Module A 生成 shot plan 后调用
 from module_b import AssetRetriever
 
-# Module A: 生成镜头计划
-planner = ShotPlanner()
-shot_plan = planner.generate("Create a luxury tech brand ad")
-# shot_plan = ["metallic sphere rotating", "gradient background fade in", ...]
-
-# Module B: 为每个镜头找素材
 retriever = AssetRetriever()
-assets_per_shot = retriever.search_multiple_shots(shot_plan)
-
-# 传给 Module C
+shot_descriptions = ["metallic sphere on dark background", ...]
+results = retriever.search_multiple_shots(shot_descriptions)
 ```
 
----
+### Module B → Module C
 
-## 文件结构
-
-```
-module_b/
-├── __init__.py              # 包入口
-├── retriever.py             # 核心搜索类
-├── setup_db.py              # 数据库初始化
-├── generate_embeddings.py   # Embedding 生成（开发用）
-├── README.md
-└── data/
-    ├── assets.json          # 素材元数据
-    └── assets_embeddings.json  # 向量数据
-```
-
----
-
-## 常见问题
-
-### Qdrant 连接失败
-
-确保 Docker 容器在运行：
-
-```bash
-docker ps  # 查看运行中的容器
-docker run -p 6333:6333 qdrant/qdrant  # 重新启动
+```python
+# 返回给 Module C 的数据
+{
+    "shot_description": "metallic sphere on dark background",
+    "matched_assets": [
+        {
+            "id": "asset_001",
+            "name": "Sphere",
+            "local_preview": "/path/to/previews/asset_001_sphere.png",
+            "score": 0.78
+        }
+    ]
+}
 ```
 
-### 搜索结果不准确
+## 注意事项
 
-检查 Qdrant Dashboard 确认数据已导入：
-
-```
-http://localhost:6333/dashboard
-```
-
-### 需要更新素材
-
-1. 修改 `data/assets.json`
-2. 运行 `python generate_embeddings.py`
-3. 运行 `python setup_db.py`
-
----
-
-## 联系
-
-Module B 负责人：James
+- 需要先启动 Qdrant 再运行 `setup_db.py`
+- 预览图来自 Freepik，仅用于演示
+- `local_preview` 为空时可用 `preview_url` 作为备选

@@ -1,1 +1,18 @@
+<<<<<<< HEAD
+# venv
+.venv/
+
+# python cache
+__pycache__/
+*.pyc
+
+# generated outputs
+module_a/out/
+module_b/assets_embeddings.json
+module_b/assets.enriched.json
+
+# temp
+gemini_smoke_test.py
+=======
 .DS_Store
+>>>>>>> origin/main

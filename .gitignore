@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # venv
 .venv/
 
@@ -12,3 +13,6 @@ module_b/assets.enriched.json
 
 # temp
 gemini_smoke_test.py
+=======
+.DS_Store
+>>>>>>> origin/main

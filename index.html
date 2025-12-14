@@ -36,7 +36,7 @@
       100% { transform: scale(1.06); }
     }
 
-    /* 通用基类 */
+    /* Base element class */
     .el {
       position: absolute;
       background-size: cover;
@@ -44,7 +44,13 @@
       background-repeat: no-repeat;
     }
 
-    /* 轨道背景层 */
+    /* When an element has a real image asset, avoid heavy cropping */
+    .el.has-asset {
+      background-size: contain;
+      background-color: transparent;
+    }
+
+    /* Track background layer */
     .track-layer {
       position: absolute;
       inset: 0;
@@ -55,7 +61,7 @@
       filter: blur(2px);
     }
 
-    /* 各类型的默认外观（后面可以被 asset 覆盖） */
+    /* Default looks (can be overridden by `asset`) */
 
     .bottle {
       width: 120px;
@@ -149,7 +155,7 @@
     }
 
     .ferris-wheel::before { transform: translate(-50%, -50%) rotate(45deg); }
-    .ferris-wheel::after { transform: translate(-50%, -50%) rotate(-45deg); }
+    .ferris-wheel::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 
     .sign {
       width: 36px;
@@ -175,7 +181,7 @@
       background: #333;
     }
 
-    /* 位置预设（如果 JSON 没给 position 就用这些） */
+    /* Position presets (used if JSON omits `position`) */
     .pos-bottle-center { left: 50%; top: 52%; transform: translate(-50%, -50%); }
     .pos-wheel-right { right: -10px; top: 40%; }
     .pos-sign-1 { right: 18%; top: 62%; }
@@ -188,7 +194,7 @@
     .pos-person-2 { left: 36%; top: 65%; }
     .pos-person-3 { left: 60%; top: 78%; }
 
-    /* 动效预设（由 JSON 的 motion 决定） */
+    /* Motion presets (mapped from JSON `motion`) */
     @keyframes bottleYaw {
       0%   { transform: translate(-50%, -50%) rotateY(-3deg); }
       100% { transform: translate(-50%, -50%) rotateY(3deg); }
@@ -200,9 +206,7 @@
       50%  { transform: translate(-50%, -6px); }
       100% { transform: translate(-50%, 0); }
     }
-    .motion-float {
-      animation: pineappleFloat 2.8s ease-in-out infinite;
-    }
+    .motion-float { animation: pineappleFloat 2.8s ease-in-out infinite; }
 
     @keyframes canTrackMove {
       0%   { left: -10%; }
@@ -244,7 +248,6 @@
       100% { transform: translateX(0); }
     }
     .motion-sway { animation: personSway 2.4s ease-in-out infinite; }
-
   </style>
 </head>
 <body>
@@ -253,110 +256,7 @@
   </div>
 
   <script>
-    // adJson v1：单镜头版本，后续 A/B 只要按这个结构输出即可
-    const adJson = {
-      shots: [
-        {
-          id: 1,
-          duration: 9000,
-          camera: {
-            movement: "slow-zoom-in",
-            angle: "slightly-top-down"
-          },
-          elements: [
-            {
-              id: "track",
-              type: "track-layer"
-            },
-            {
-              id: "product",
-              type: "bottle",
-              motion: "yaw",
-              position: { x: 50, y: 52 },   // 百分比位置
-              presetPosition: "pos-bottle-center"
-            },
-            {
-              id: "platform",
-              type: "bottle-platform",
-              parent: "product"
-            },
-            {
-              id: "fruitTop",
-              type: "pineapple",
-              parent: "platform",
-              motion: "float"
-            },
-            {
-              id: "canLoop",
-              type: "can-on-track",
-              motion: "loop-track"
-            },
-            {
-              id: "wheelRight",
-              type: "ferris-wheel",
-              motion: "rotate-wheel",
-              presetPosition: "pos-wheel-right"
-            },
-            {
-              id: "sign1",
-              type: "sign",
-              motion: "spin-slow",
-              presetPosition: "pos-sign-1"
-            },
-            {
-              id: "sign2",
-              type: "sign",
-              motion: "spin-slow",
-              presetPosition: "pos-sign-2"
-            },
-            {
-              id: "soloCan",
-              type: "solo-can",
-              motion: "rise-spin",
-              presetPosition: "pos-solo-can-left"
-            },
-            {
-              id: "tree1",
-              type: "tree",
-              motion: null,
-              presetPosition: "pos-tree-1"
-            },
-            {
-              id: "tree2",
-              type: "tree",
-              motion: null,
-              presetPosition: "pos-tree-2"
-            },
-            {
-              id: "tree3",
-              type: "tree",
-              motion: null,
-              presetPosition: "pos-tree-3"
-            },
-            {
-              id: "person1",
-              type: "person",
-              motion: "sway",
-              presetPosition: "pos-person-1"
-            },
-            {
-              id: "person2",
-              type: "person",
-              motion: "sway",
-              presetPosition: "pos-person-2"
-            },
-            {
-              id: "person3",
-              type: "person",
-              motion: "sway",
-              presetPosition: "pos-person-3"
-            }
-          ]
-        }
-      ]
-    };
-
-    // 将 motion 字段转换成具体的 CSS 类名
+    // Map motion values from adJson to CSS class names
     function motionToClass(motion) {
       if (!motion) return null;
       switch (motion) {
@@ -375,7 +275,7 @@
       const inner = document.getElementById("scene-inner");
       inner.innerHTML = "";
 
-      // 轨道背景单独处理
+      // Track background is handled separately
       const hasTrack = shot.elements.some(e => e.type === "track-layer");
       if (hasTrack) {
         const track = document.createElement("div");
@@ -390,7 +290,7 @@
         .forEach(el => {
           let node;
 
-          // 按 type 创建不同的元素
+          // Create a DOM node based on element type
           switch (el.type) {
             case "bottle": {
               node = document.createElement("div");
@@ -438,53 +338,86 @@
               break;
             }
             default:
-              return; // 未知类型暂时忽略
+              return; // Unknown type is ignored for now
           }
 
-          // 如果 JSON 给了 position，就用百分比定位
+          // If JSON provides explicit position (percent-based), use it
           if (el.position && typeof el.position.x === "number" && typeof el.position.y === "number") {
             node.style.left = el.position.x + "%";
             node.style.top = el.position.y + "%";
-            // 特殊情况：中间瓶子要居中
             if (el.type === "bottle") {
               node.style.transform = "translate(-50%, -50%)";
             }
           }
 
-          // 如果给了预设位置 class，就加上
+          // Apply preset position class if present
           if (el.presetPosition) {
             node.classList.add(el.presetPosition);
           }
 
-          // 如果给了 asset，就当作背景图
+          // If `asset` exists, use it as a background image
           if (el.asset) {
             node.style.backgroundImage = `url('${el.asset}')`;
+            node.classList.add("has-asset");
+            
           }
 
-          // 如果有动效字段，就加对应 CSS 类
+          // Apply motion class if present
           const motionClass = motionToClass(el.motion);
           if (motionClass) {
             node.classList.add(motionClass);
           }
 
-          // 先挂到 scene 或父元素上
+          // Attach to parent element if specified
           if (el.parent && refs[el.parent]) {
             refs[el.parent].appendChild(node);
           } else if (el.parent && el.parent === "product" && refs["platform"]) {
-            // pineapple 的 parent 绑在平台上
             refs["platform"].appendChild(node);
           } else {
             inner.appendChild(node);
           }
 
-          // 保留引用，方便后续元素作为 parent
+          // Store reference for future children
           if (el.id) {
             refs[el.id] = node;
           }
         });
     }
 
-    renderShot(adJson.shots[0]);
+    // Load the merged adJson from the local server output
+    async function loadAdJson() {
+      const res = await fetch("./module_a/out/adJson.with_assets.json");
+      if (!res.ok) throw new Error(`Failed to load adJson: ${res.status} ${res.statusText}`);
+      return await res.json();
+    }
+
+    function playShots(adJson) {
+      const shots = Array.isArray(adJson.shots) ? adJson.shots : [];
+      if (shots.length === 0) {
+        console.warn("No shots found in adJson.");
+        return;
+      }
+
+      let idx = 0;
+
+      function playNext() {
+        const shot = shots[idx];
+        renderShot(shot);
+
+        const durationMs = (shot && typeof shot.duration === "number") ? shot.duration : 3000;
+        idx = (idx + 1) % shots.length;
+
+        window.setTimeout(playNext, durationMs);
+      }
+
+      playNext();
+    }
+
+    // Bootstrap
+    (async () => {
+      const adJson = await loadAdJson();
+      playShots(adJson);
+    })();
   </script>
 </body>
 </html>

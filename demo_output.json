@@ -1,0 +1,55 @@
+{
+  "input": {
+    "brand": "PeachSpark",
+    "product": "Sparkling Drink",
+    "style": "dreamy, clean colors, playful, subtle motion",
+    "speed": "normal",
+    "quality": "balanced"
+  },
+  "assetCatalog": {
+    "product_main": { "url": "https://via.placeholder.com/400x800/FFAA88/ffffff?text=PRODUCT" },
+    "fruit_yellow": { "url": "https://via.placeholder.com/120/FFD95C/ffffff?text=FRUIT" },
+    "ring_basic": { "url": "https://via.placeholder.com/200/FFC0E0/ffffff?text=RING" },
+    "sphere_basic": { "url": "https://via.placeholder.com/140/C0FFE0/ffffff?text=SPHERE" },
+    "crystal_basic": { "url": "https://via.placeholder.com/140/E0C0FF/ffffff?text=CRYSTAL" }
+  },
+  "adJson": {
+    "shots": [
+      {
+        "id": 1,
+        "duration": 9000,
+        "camera": { "movement": "slow-zoom-in", "angle": "slightly-top-down" },
+        "elements": [
+          { "id": "product", "type": "bottle", "motion": "yaw", "presetPosition": "pos-bottle-center", "assetId": "product_main" },
+          { "id": "fruitTop", "type": "pineapple", "motion": "float", "position": { "x": 50, "y": 26 }, "assetId": "fruit_yellow" },
+          { "id": "wheelRight", "type": "ferris-wheel", "motion": "rotate-wheel", "presetPosition": "pos-wheel-right", "assetId": "ring_basic" },
+          { "id": "soloCan", "type": "solo-can", "motion": "rise-spin", "presetPosition": "pos-solo-can-left", "assetId": "sphere_basic" },
+          { "id": "tree1", "type": "tree", "presetPosition": "pos-tree-1", "assetId": "crystal_basic" },
+          { "id": "person1", "type": "person", "motion": "sway", "presetPosition": "pos-person-1" }
+        ]
+      }
+    ]
+  },
+  "scoring": {
+    "method": "qdrant_style_topk_demo",
+    "queries": [
+      {
+        "query": "ring / ferris wheel structure, clean dreamy style",
+        "top_k": [
+          { "asset_id": "ring_basic", "score": 0.842, "source": "freepik_or_placeholder" },
+          { "asset_id": "crystal_basic", "score": 0.611, "source": "freepik_or_placeholder" },
+          { "asset_id": "sphere_basic", "score": 0.506, "source": "freepik_or_placeholder" }
+        ],
+        "selected": { "asset_id": "ring_basic", "score": 0.842 }
+      },
+      {
+        "query": "floating fruit accent, warm yellow",
+        "top_k": [
+          { "asset_id": "fruit_yellow", "score": 0.901, "source": "freepik_or_placeholder" },
+          { "asset_id": "sphere_basic", "score": 0.433, "source": "freepik_or_placeholder" }
+        ],
+        "selected": { "asset_id": "fruit_yellow", "score": 0.901 }
+      }
+    ]
+  }
+}

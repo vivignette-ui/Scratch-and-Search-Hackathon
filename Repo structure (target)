@@ -1,0 +1,17 @@
+.
+├─ index.html
+├─ README.md
+├─ .env.example
+├─ requirements.txt
+├─ docker-compose.yml
+├─ GUARDRAILS.md
+├─ ASSET_SOURCES.md
+├─ run_pipeline.py
+├─ demo_input.json
+├─ demo_output.json
+├─ module_a/
+│  └─ scene_planner.py
+└─ module_b/
+   ├─ qdrant_client.py
+   ├─ freepik_client.py
+   └─ asset_catalog.json

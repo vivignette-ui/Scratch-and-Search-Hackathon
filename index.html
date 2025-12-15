@@ -2,45 +2,97 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Brand Ad Scene Player – Module C</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>AI Short Ad Generator Demo</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
-      background: #111;
+      background: #0f0f12;
+      color: #f4f4f6;
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      padding: 18px;
     }
-
-    /* Vertical short-video canvas */
+    .wrap {
+      width: min(1050px, 100%);
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .card {
+      background: #16161c;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    }
+    h1 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .sub {
+      font-size: 12px;
+      color: rgba(244,244,246,0.75);
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: rgba(244,244,246,0.85);
+      margin: 10px 0 6px;
+    }
+    input, select, button, textarea {
+      width: 100%;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: #0f0f12;
+      color: #f4f4f6;
+      outline: none;
+      font-size: 13px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    button {
+      background: #2a6df4;
+      border: 1px solid rgba(255,255,255,0.12);
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+    button:hover { filter: brightness(1.05); }
     .scene {
       position: relative;
       width: 360px;
       height: 640px;
       overflow: hidden;
-      border-radius: 24px;
+      border-radius: 22px;
       background: radial-gradient(circle at top, #ffe0f0 0%, #ffc0d8 40%, #f58ab0 80%);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      box-shadow: 0 18px 55px rgba(0,0,0,0.55);
+      margin: 10px auto 0;
     }
-
-    /* Global camera motion */
     .scene-inner {
       position: absolute;
       inset: 0;
       transform-origin: center;
-      animation: cameraZoom 9s linear infinite;
     }
+
+    /* Camera presets */
+    .cam-slow { animation: cameraZoom 9s linear infinite; }
+    .cam-fast { animation: cameraZoom 6s linear infinite; }
 
     @keyframes cameraZoom {
       0%   { transform: scale(1.0); }
       100% { transform: scale(1.06); }
     }
 
-    /* Base element */
     .el {
       position: absolute;
       background-size: contain;
@@ -48,7 +100,7 @@
       background-position: center;
     }
 
-    /* Fallback visuals (when no asset image is provided) */
+    /* Fallback visuals */
     .bottle {
       width: 120px;
       height: 320px;
@@ -57,41 +109,31 @@
       transform: translate(-50%, -50%);
       box-shadow: 0 18px 40px rgba(0,0,0,0.35);
     }
-
     .pineapple {
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       border-radius: 12px;
       background: radial-gradient(circle, #ffe699, #ffbf3f 40%, #f28a00);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.30);
     }
-
     .ferris-wheel {
-      width: 120px;
-      height: 120px;
+      width: 120px; height: 120px;
       border-radius: 50%;
       background: radial-gradient(circle, #ffe9f6, #ffb6d9 60%, #ff8fc8);
     }
-
     .solo-can {
-      width: 40px;
-      height: 70px;
+      width: 40px; height: 70px;
       border-radius: 16px;
       background: linear-gradient(to bottom, #ffffff, #ffe3f7 40%, #ffc8ed);
-      box-shadow: 0 8px 14px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 14px rgba(0,0,0,0.40);
     }
-
     .tree {
-      width: 28px;
-      height: 28px;
+      width: 28px; height: 28px;
       border-radius: 50%;
       background: radial-gradient(circle, #e9ffef, #58c978 40%, #21753c);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.30);
     }
-
     .person {
-      width: 6px;
-      height: 12px;
+      width: 6px; height: 12px;
       border-radius: 3px;
       background: #333;
     }
@@ -132,9 +174,7 @@
       0%   { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .motion-rise-spin {
-      animation: soloRise 9s ease-in-out infinite, soloSpin 4s linear infinite;
-    }
+    .motion-rise-spin { animation: soloRise 9s ease-in-out infinite, soloSpin 4s linear infinite; }
 
     @keyframes sway {
       0%   { transform: translateX(0); }
@@ -143,105 +183,82 @@
     }
     .motion-sway { animation: sway 2.4s ease-in-out infinite; }
 
+    .panelTitle { font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.35; }
+    .tiny { font-size: 11px; opacity: 0.8; }
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 11px;
+      color: rgba(244,244,246,0.85);
+    }
+    .hr { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 0; }
   </style>
 </head>
 
 <body>
-  <div class="scene">
-    <div class="scene-inner" id="scene-inner"></div>
+  <div class="wrap">
+    <div class="card">
+      <h1>AI Short Ad Generator</h1>
+      <div class="sub">
+        Input brand + product + style, then render a 6–10s mini-world ad scene.
+        This demo also shows transparent similarity scoring (Qdrant-style top-k).
+      </div>
+
+      <label>Brand</label>
+      <input id="brand" value="PeachSpark"/>
+
+      <label>Featured product</label>
+      <input id="product" value="Sparkling Drink"/>
+
+      <label>Style keywords</label>
+      <input id="style" value="dreamy, clean colors, playful, subtle motion"/>
+
+      <div class="row">
+        <div>
+          <label>Speed</label>
+          <select id="speed">
+            <option value="fast">Fast</option>
+            <option value="normal" selected>Normal</option>
+          </select>
+        </div>
+        <div>
+          <label>Quality</label>
+          <select id="quality">
+            <option value="draft">Draft</option>
+            <option value="balanced" selected>Balanced</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="generateBtn">Generate</button>
+
+      <div class="hr"></div>
+
+      <div class="panelTitle">Qdrant scoring (transparent)</div>
+      <div id="scoreBox" class="mono tiny">Click Generate to load demo_output.json…</div>
+
+      <div class="hr"></div>
+
+      <div class="panelTitle">Current adJson</div>
+      <textarea id="jsonBox" class="mono" rows="10" spellcheck="false"></textarea>
+      <div class="tiny" style="margin-top:8px;">
+        Tip: this demo loads <span class="pill">demo_output.json</span> from the repo.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="panelTitle">Preview</div>
+      <div class="scene">
+        <div class="scene-inner cam-slow" id="scene-inner"></div>
+      </div>
+    </div>
   </div>
 
   <script>
-    /* ==========================
-       Asset Catalog (Module B output)
-       ========================== */
-
-    const assetCatalog = {
-      product_main: {
-        type: "bottle",
-        url: "https://via.placeholder.com/400x800/FFAA88/ffffff?text=PRODUCT"
-      },
-      fruit_yellow: {
-        type: "pineapple",
-        url: "https://via.placeholder.com/120/FFD95C/ffffff?text=FRUIT"
-      },
-      ring_basic: {
-        type: "ring",
-        url: "https://via.placeholder.com/200/FFC0E0/ffffff?text=RING"
-      },
-      sphere_basic: {
-        type: "sphere",
-        url: "https://via.placeholder.com/140/C0FFE0/ffffff?text=SPHERE"
-      },
-      crystal_basic: {
-        type: "crystal",
-        url: "https://via.placeholder.com/140/E0C0FF/ffffff?text=CRYSTAL"
-      }
-    };
-
-    /* ==========================
-       adJson (A + B combined output)
-       ========================== */
-
-    const adJson = {
-      shots: [
-        {
-          id: 1,
-          duration: 9000,
-          camera: {
-            movement: "slow-zoom-in",
-            angle: "slightly-top-down"
-          },
-          elements: [
-            {
-              id: "product",
-              type: "bottle",
-              motion: "yaw",
-              presetPosition: "pos-bottle-center",
-              assetId: "product_main"
-            },
-            {
-              id: "fruitTop",
-              type: "pineapple",
-              motion: "float",
-              position: { x: 50, y: 26 },
-              assetId: "fruit_yellow"
-            },
-            {
-              id: "wheelRight",
-              type: "ferris-wheel",
-              motion: "rotate-wheel",
-              presetPosition: "pos-wheel-right",
-              assetId: "ring_basic"
-            },
-            {
-              id: "soloCan",
-              type: "solo-can",
-              motion: "rise-spin",
-              presetPosition: "pos-solo-can-left",
-              assetId: "sphere_basic"
-            },
-            {
-              id: "tree1",
-              type: "tree",
-              presetPosition: "pos-tree-1",
-              assetId: "crystal_basic"
-            },
-            {
-              id: "person1",
-              type: "person",
-              motion: "sway",
-              presetPosition: "pos-person-1"
-            }
-          ]
-        }
-      ]
-    };
-
-    /* ==========================
-       Motion mapping
-       ========================== */
-
     function motionToClass(motion) {
       switch (motion) {
         case "yaw": return "motion-yaw";
@@ -253,11 +270,33 @@
       }
     }
 
-    /* ==========================
-       Renderer (Module C core)
-       ========================== */
+    function applyTradeoffs(adJson, speed, quality) {
+      const out = JSON.parse(JSON.stringify(adJson));
 
-    function renderShot(shot) {
+      // Speed: camera timing
+      const inner = document.getElementById("scene-inner");
+      inner.classList.remove("cam-fast", "cam-slow");
+      inner.classList.add(speed === "fast" ? "cam-fast" : "cam-slow");
+
+      // Quality: element count + motion intensity (simple caps)
+      const elems = out.shots[0].elements;
+
+      if (quality === "draft") {
+        // Keep only core hero + 2 supporting elements
+        out.shots[0].elements = elems.filter(e => ["product","wheelRight","fruitTop"].includes(e.id));
+      } else if (quality === "balanced") {
+        // Keep as is
+      } else if (quality === "high") {
+        // Add a couple extra decorative people/trees (still subtle)
+        out.shots[0].elements.push(
+          { id: "tree2", type: "tree", presetPosition: "pos-tree-1", assetId: "crystal_basic" },
+          { id: "person2", type: "person", motion: "sway", presetPosition: "pos-person-1" }
+        );
+      }
+      return out;
+    }
+
+    function renderShot(shot, assetCatalog) {
       const inner = document.getElementById("scene-inner");
       inner.innerHTML = "";
       const refs = {};
@@ -270,25 +309,72 @@
           node.style.left = el.position.x + "%";
           node.style.top = el.position.y + "%";
         }
-        if (el.presetPosition) {
-          node.classList.add(el.presetPosition);
-        }
+        if (el.presetPosition) node.classList.add(el.presetPosition);
 
-        if (el.assetId && assetCatalog[el.assetId]) {
-          node.style.backgroundImage = `url('${assetCatalog[el.assetId].url}')`;
-        } else if (el.asset) {
-          node.style.backgroundImage = `url('${el.asset}')`;
-        }
+        // Asset resolution
+        const url = (el.assetId && assetCatalog[el.assetId]) ? assetCatalog[el.assetId].url : el.asset;
+        if (url) node.style.backgroundImage = `url('${url}')`;
 
-        const motionClass = motionToClass(el.motion);
-        if (motionClass) node.classList.add(motionClass);
+        const mc = motionToClass(el.motion);
+        if (mc) node.classList.add(mc);
 
         inner.appendChild(node);
         refs[el.id] = node;
       });
     }
 
-    renderShot(adJson.shots[0]);
+    function pretty(obj) { return JSON.stringify(obj, null, 2); }
+
+    async function loadDemoOutput() {
+      // demo_output.json is committed in repo root
+      const resp = await fetch("./demo_output.json", { cache: "no-store" });
+      if (!resp.ok) throw new Error("Cannot load demo_output.json");
+      return await resp.json();
+    }
+
+    function renderScores(scoring) {
+      const box = document.getElementById("scoreBox");
+      if (!scoring || !scoring.queries) {
+        box.textContent = "No scoring found in JSON.";
+        return;
+      }
+      const lines = [];
+      for (const q of scoring.queries) {
+        lines.push(`Query: "${q.query}"`);
+        for (const r of q.top_k) {
+          lines.push(`  - ${r.asset_id}  score=${r.score.toFixed(3)}  source=${r.source}`);
+        }
+        lines.push(`Selected: ${q.selected.asset_id}  score=${q.selected.score.toFixed(3)}`);
+        lines.push("");
+      }
+      box.textContent = lines.join("\n");
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", async () => {
+      const speed = document.getElementById("speed").value;
+      const quality = document.getElementById("quality").value;
+
+      const demo = await loadDemoOutput();
+
+      // Update inputs inside JSON for completeness (so it looks dynamic)
+      demo.input = {
+        brand: document.getElementById("brand").value,
+        product: document.getElementById("product").value,
+        style: document.getElementById("style").value,
+        speed,
+        quality
+      };
+
+      const finalJson = applyTradeoffs(demo.adJson, speed, quality);
+
+      document.getElementById("jsonBox").value = pretty({ input: demo.input, adJson: finalJson });
+
+      renderScores(demo.scoring);
+      renderShot(finalJson.shots[0], demo.assetCatalog);
+    });
+
+    // Auto-run once
+    document.getElementById("generateBtn").click();
   </script>
 </body>
 </html>

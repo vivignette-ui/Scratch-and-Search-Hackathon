@@ -1,0 +1,7 @@
+{
+  "product_main": { "url": "https://via.placeholder.com/400x800/FFAA88/ffffff?text=PRODUCT" },
+  "fruit_yellow": { "url": "https://via.placeholder.com/120/FFD95C/ffffff?text=FRUIT" },
+  "ring_basic": { "url": "https://via.placeholder.com/200/FFC0E0/ffffff?text=RING" },
+  "sphere_basic": { "url": "https://via.placeholder.com/140/C0FFE0/ffffff?text=SPHERE" },
+  "crystal_basic": { "url": "https://via.placeholder.com/140/E0C0FF/ffffff?text=CRYSTAL" }
+}

@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Brand Ad Scene Player (adJson v1)</title>
+  <title>AI Brand Ad Scene Player – Module C</title>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       background: #111;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     }
 
+    /* Vertical short-video canvas */
     .scene {
       position: relative;
       width: 360px;
@@ -22,8 +24,10 @@
       overflow: hidden;
       border-radius: 24px;
       background: radial-gradient(circle at top, #ffe0f0 0%, #ffc0d8 40%, #f58ab0 80%);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
     }
 
+    /* Global camera motion */
     .scene-inner {
       position: absolute;
       inset: 0;
@@ -36,141 +40,52 @@
       100% { transform: scale(1.06); }
     }
 
-    /* Base element class */
+    /* Base element */
     .el {
       position: absolute;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    /* When an element has a real image asset, avoid heavy cropping */
-    .el.has-asset {
       background-size: contain;
-      background-color: transparent;
+      background-repeat: no-repeat;
+      background-position: center;
     }
 
-    /* Track background layer */
-    .track-layer {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.9) 0, transparent 55%),
-        radial-gradient(circle at 80% 30%, rgba(255,255,255,0.8) 0, transparent 55%);
-      opacity: 0.65;
-      filter: blur(2px);
-    }
-
-    /* Default looks (can be overridden by `asset`) */
-
+    /* Fallback visuals (when no asset image is provided) */
     .bottle {
       width: 120px;
       height: 320px;
       border-radius: 40px;
-      background: linear-gradient(to bottom, #ffbf6d 0%, #b54b16 40%, #5a1c06 100%);
-      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+      background: linear-gradient(to bottom, #ffbf6d, #b54b16 40%, #5a1c06);
       transform: translate(-50%, -50%);
-    }
-
-    .bottle::after {
-      content: "";
-      position: absolute;
-      inset: 8px;
-      border-radius: 36px;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.45) 0, transparent 55%),
-        radial-gradient(circle at 70% 40%, rgba(255,255,255,0.25) 0, transparent 60%),
-        radial-gradient(circle at 50% 80%, rgba(255,255,255,0.35) 0, transparent 60%);
-      mix-blend-mode: screen;
-      opacity: 0.9;
-    }
-
-    .bottle-platform {
-      position: absolute;
-      left: 50%;
-      top: 20%;
-      width: 150px;
-      height: 40px;
-      transform: translateX(-50%);
-      border-radius: 60px;
-      background: rgba(255,255,255,0.95);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
     }
 
     .pineapple {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: radial-gradient(circle at 30% 20%, #ffe699 0, #ffbf3f 40%, #f28a00 100%);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.25);
-    }
-
-    .pineapple::before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: -14px;
-      transform: translateX(-50%);
-      width: 22px;
-      height: 16px;
-      border-radius: 0 0 16px 16px;
-      background: radial-gradient(circle at 50% 0%, #2ecc71 0, #1c9c4c 60%, #0b5c2b 100%);
-    }
-
-    .can-on-track,
-    .solo-can {
-      width: 34px;
-      height: 52px;
+      width: 40px;
+      height: 40px;
       border-radius: 12px;
-      background: linear-gradient(to bottom, #ffffff 0%, #ffebfb 50%, #ffd6f4 100%);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.25);
-    }
-
-    .solo-can {
-      width: 36px;
-      height: 60px;
-      border-radius: 14px;
-      background: linear-gradient(to bottom, #ffffff 0%, #ffe3f5 40%, #ffc6ea 100%);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.35);
+      background: radial-gradient(circle, #ffe699, #ffbf3f 40%, #f28a00);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
     }
 
     .ferris-wheel {
       width: 120px;
       height: 120px;
       border-radius: 50%;
-      border: 6px solid #ff9ac5;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+      background: radial-gradient(circle, #ffe9f6, #ffb6d9 60%, #ff8fc8);
     }
 
-    .ferris-wheel::before,
-    .ferris-wheel::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 4px;
-      height: 100%;
-      background: #ff9ac5;
-      transform-origin: center;
-    }
-
-    .ferris-wheel::before { transform: translate(-50%, -50%) rotate(45deg); }
-    .ferris-wheel::after  { transform: translate(-50%, -50%) rotate(-45deg); }
-
-    .sign {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 3px solid #ffb6cf;
-      background: #ffeef5;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.18);
+    .solo-can {
+      width: 40px;
+      height: 70px;
+      border-radius: 16px;
+      background: linear-gradient(to bottom, #ffffff, #ffe3f7 40%, #ffc8ed);
+      box-shadow: 0 8px 14px rgba(0,0,0,0.4);
     }
 
     .tree {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 20%, #e9ffef 0, #58c978 40%, #21753c 100%);
+      background: radial-gradient(circle, #e9ffef, #58c978 40%, #21753c);
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
 
@@ -181,20 +96,14 @@
       background: #333;
     }
 
-    /* Position presets (used if JSON omits `position`) */
+    /* Layout presets */
     .pos-bottle-center { left: 50%; top: 52%; transform: translate(-50%, -50%); }
-    .pos-wheel-right { right: -10px; top: 40%; }
-    .pos-sign-1 { right: 18%; top: 62%; }
-    .pos-sign-2 { right: 8%; top: 72%; }
-    .pos-solo-can-left { left: 10%; bottom: 12%; }
-    .pos-tree-1 { left: 22%; top: 70%; }
-    .pos-tree-2 { left: 32%; top: 60%; }
-    .pos-tree-3 { left: 64%; top: 74%; }
-    .pos-person-1 { left: 26%; top: 77%; }
-    .pos-person-2 { left: 36%; top: 65%; }
-    .pos-person-3 { left: 60%; top: 78%; }
+    .pos-wheel-right   { right: -6%; top: 36%; }
+    .pos-solo-can-left { left: 10%; bottom: 14%; }
+    .pos-tree-1        { left: 23%; top: 72%; }
+    .pos-person-1      { left: 28%; top: 80%; }
 
-    /* Motion presets (mapped from JSON `motion`) */
+    /* Motion presets */
     @keyframes bottleYaw {
       0%   { transform: translate(-50%, -50%) rotateY(-3deg); }
       100% { transform: translate(-50%, -50%) rotateY(3deg); }
@@ -202,18 +111,11 @@
     .motion-yaw { animation: bottleYaw 4s ease-in-out infinite alternate; }
 
     @keyframes pineappleFloat {
-      0%   { transform: translate(-50%, 0); }
-      50%  { transform: translate(-50%, -6px); }
-      100% { transform: translate(-50%, 0); }
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-6px); }
+      100% { transform: translateY(0); }
     }
-    .motion-float { animation: pineappleFloat 2.8s ease-in-out infinite; }
-
-    @keyframes canTrackMove {
-      0%   { left: -10%; }
-      50%  { left: 80%; }
-      100% { left: -10%; }
-    }
-    .motion-loop-track { animation: canTrackMove 9s linear infinite; }
+    .motion-float { animation: pineappleFloat 3s ease-in-out infinite; }
 
     @keyframes wheelRotate {
       0%   { transform: rotate(0deg); }
@@ -221,203 +123,172 @@
     }
     .motion-rotate-wheel { animation: wheelRotate 20s linear infinite; }
 
-    @keyframes signSpin {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .motion-spin-slow { animation: signSpin 10s linear infinite; }
-
-    @keyframes soloCanRise {
+    @keyframes soloRise {
       0%   { transform: translateY(0); }
       50%  { transform: translateY(-80px); }
       100% { transform: translateY(0); }
     }
-    @keyframes soloCanSpin {
+    @keyframes soloSpin {
       0%   { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
     .motion-rise-spin {
-      animation:
-        soloCanRise 9s ease-in-out infinite,
-        soloCanSpin 4s linear infinite;
+      animation: soloRise 9s ease-in-out infinite, soloSpin 4s linear infinite;
     }
 
-    @keyframes personSway {
+    @keyframes sway {
       0%   { transform: translateX(0); }
       50%  { transform: translateX(2px); }
       100% { transform: translateX(0); }
     }
-    .motion-sway { animation: personSway 2.4s ease-in-out infinite; }
+    .motion-sway { animation: sway 2.4s ease-in-out infinite; }
+
   </style>
 </head>
+
 <body>
   <div class="scene">
     <div class="scene-inner" id="scene-inner"></div>
   </div>
 
   <script>
-    // Map motion values from adJson to CSS class names
+    /* ==========================
+       Asset Catalog (Module B output)
+       ========================== */
+
+    const assetCatalog = {
+      product_main: {
+        type: "bottle",
+        url: "https://via.placeholder.com/400x800/FFAA88/ffffff?text=PRODUCT"
+      },
+      fruit_yellow: {
+        type: "pineapple",
+        url: "https://via.placeholder.com/120/FFD95C/ffffff?text=FRUIT"
+      },
+      ring_basic: {
+        type: "ring",
+        url: "https://via.placeholder.com/200/FFC0E0/ffffff?text=RING"
+      },
+      sphere_basic: {
+        type: "sphere",
+        url: "https://via.placeholder.com/140/C0FFE0/ffffff?text=SPHERE"
+      },
+      crystal_basic: {
+        type: "crystal",
+        url: "https://via.placeholder.com/140/E0C0FF/ffffff?text=CRYSTAL"
+      }
+    };
+
+    /* ==========================
+       adJson (A + B combined output)
+       ========================== */
+
+    const adJson = {
+      shots: [
+        {
+          id: 1,
+          duration: 9000,
+          camera: {
+            movement: "slow-zoom-in",
+            angle: "slightly-top-down"
+          },
+          elements: [
+            {
+              id: "product",
+              type: "bottle",
+              motion: "yaw",
+              presetPosition: "pos-bottle-center",
+              assetId: "product_main"
+            },
+            {
+              id: "fruitTop",
+              type: "pineapple",
+              motion: "float",
+              position: { x: 50, y: 26 },
+              assetId: "fruit_yellow"
+            },
+            {
+              id: "wheelRight",
+              type: "ferris-wheel",
+              motion: "rotate-wheel",
+              presetPosition: "pos-wheel-right",
+              assetId: "ring_basic"
+            },
+            {
+              id: "soloCan",
+              type: "solo-can",
+              motion: "rise-spin",
+              presetPosition: "pos-solo-can-left",
+              assetId: "sphere_basic"
+            },
+            {
+              id: "tree1",
+              type: "tree",
+              presetPosition: "pos-tree-1",
+              assetId: "crystal_basic"
+            },
+            {
+              id: "person1",
+              type: "person",
+              motion: "sway",
+              presetPosition: "pos-person-1"
+            }
+          ]
+        }
+      ]
+    };
+
+    /* ==========================
+       Motion mapping
+       ========================== */
+
     function motionToClass(motion) {
-      if (!motion) return null;
       switch (motion) {
         case "yaw": return "motion-yaw";
         case "float": return "motion-float";
-        case "loop-track": return "motion-loop-track";
         case "rotate-wheel": return "motion-rotate-wheel";
-        case "spin-slow": return "motion-spin-slow";
         case "rise-spin": return "motion-rise-spin";
         case "sway": return "motion-sway";
         default: return null;
       }
     }
 
+    /* ==========================
+       Renderer (Module C core)
+       ========================== */
+
     function renderShot(shot) {
       const inner = document.getElementById("scene-inner");
       inner.innerHTML = "";
-
-      // Track background is handled separately
-      const hasTrack = shot.elements.some(e => e.type === "track-layer");
-      if (hasTrack) {
-        const track = document.createElement("div");
-        track.className = "track-layer";
-        inner.appendChild(track);
-      }
-
       const refs = {};
 
-      shot.elements
-        .filter(e => e.type !== "track-layer")
-        .forEach(el => {
-          let node;
+      shot.elements.forEach(el => {
+        const node = document.createElement("div");
+        node.className = "el " + el.type;
 
-          // Create a DOM node based on element type
-          switch (el.type) {
-            case "bottle": {
-              node = document.createElement("div");
-              node.className = "el bottle";
-              break;
-            }
-            case "bottle-platform": {
-              node = document.createElement("div");
-              node.className = "bottle-platform";
-              break;
-            }
-            case "pineapple": {
-              node = document.createElement("div");
-              node.className = "el pineapple";
-              break;
-            }
-            case "can-on-track": {
-              node = document.createElement("div");
-              node.className = "el can-on-track";
-              break;
-            }
-            case "solo-can": {
-              node = document.createElement("div");
-              node.className = "el solo-can";
-              break;
-            }
-            case "ferris-wheel": {
-              node = document.createElement("div");
-              node.className = "el ferris-wheel";
-              break;
-            }
-            case "sign": {
-              node = document.createElement("div");
-              node.className = "el sign";
-              break;
-            }
-            case "tree": {
-              node = document.createElement("div");
-              node.className = "el tree";
-              break;
-            }
-            case "person": {
-              node = document.createElement("div");
-              node.className = "el person";
-              break;
-            }
-            default:
-              return; // Unknown type is ignored for now
-          }
+        if (el.position) {
+          node.style.left = el.position.x + "%";
+          node.style.top = el.position.y + "%";
+        }
+        if (el.presetPosition) {
+          node.classList.add(el.presetPosition);
+        }
 
-          // If JSON provides explicit position (percent-based), use it
-          if (el.position && typeof el.position.x === "number" && typeof el.position.y === "number") {
-            node.style.left = el.position.x + "%";
-            node.style.top = el.position.y + "%";
-            if (el.type === "bottle") {
-              node.style.transform = "translate(-50%, -50%)";
-            }
-          }
+        if (el.assetId && assetCatalog[el.assetId]) {
+          node.style.backgroundImage = `url('${assetCatalog[el.assetId].url}')`;
+        } else if (el.asset) {
+          node.style.backgroundImage = `url('${el.asset}')`;
+        }
 
-          // Apply preset position class if present
-          if (el.presetPosition) {
-            node.classList.add(el.presetPosition);
-          }
+        const motionClass = motionToClass(el.motion);
+        if (motionClass) node.classList.add(motionClass);
 
-          // If `asset` exists, use it as a background image
-          if (el.asset) {
-            node.style.backgroundImage = `url('${el.asset}')`;
-            node.classList.add("has-asset");
-            
-          }
-
-          // Apply motion class if present
-          const motionClass = motionToClass(el.motion);
-          if (motionClass) {
-            node.classList.add(motionClass);
-          }
-
-          // Attach to parent element if specified
-          if (el.parent && refs[el.parent]) {
-            refs[el.parent].appendChild(node);
-          } else if (el.parent && el.parent === "product" && refs["platform"]) {
-            refs["platform"].appendChild(node);
-          } else {
-            inner.appendChild(node);
-          }
-
-          // Store reference for future children
-          if (el.id) {
-            refs[el.id] = node;
-          }
-        });
+        inner.appendChild(node);
+        refs[el.id] = node;
+      });
     }
 
-    // Load the merged adJson from the local server output
-    async function loadAdJson() {
-      const res = await fetch("./module_a/out/adJson.with_assets.json");
-      if (!res.ok) throw new Error(`Failed to load adJson: ${res.status} ${res.statusText}`);
-      return await res.json();
-    }
-
-    function playShots(adJson) {
-      const shots = Array.isArray(adJson.shots) ? adJson.shots : [];
-      if (shots.length === 0) {
-        console.warn("No shots found in adJson.");
-        return;
-      }
-
-      let idx = 0;
-
-      function playNext() {
-        const shot = shots[idx];
-        renderShot(shot);
-
-        const durationMs = (shot && typeof shot.duration === "number") ? shot.duration : 3000;
-        idx = (idx + 1) % shots.length;
-
-        window.setTimeout(playNext, durationMs);
-      }
-
-      playNext();
-    }
-
-    // Bootstrap
-    (async () => {
-      const adJson = await loadAdJson();
-      playShots(adJson);
-    })();
+    renderShot(adJson.shots[0]);
   </script>
 </body>
 </html>
